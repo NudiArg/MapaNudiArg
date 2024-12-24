@@ -59,6 +59,11 @@
                                 <strong>Fecha:</strong> ${fecha}<br>
                                 <img src="${foto}" alt="Foto del nudibranquio" class="popup-img">
                             `;
+                            <style>
+    .popup-species {
+        font-style: italic;
+    }
+</style>
 
                             // Crear el marcador
                             var marker = L.marker([lat, lng]).bindPopup(popupContent);
