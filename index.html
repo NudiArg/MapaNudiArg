@@ -10,10 +10,13 @@
     <style>
         #map { height: 600px; width: 100%; }
         .popup-img { width: 100px; height: auto; }
+        .popup-species {
+            font-style: italic;
+        }
     </style>
 </head>
 <body>
-    <h2> </h2>
+    <h2>Mapa de Nudibranquios</h2>
     <div id="map"></div>
 
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
@@ -45,25 +48,23 @@
 
                         // Leer las columnas del CSV
                         var observador = cols[0];
-                        var fecha = cols[1];
+                        var fecha = new Date(cols[1]); // Convertir la fecha a un objeto Date
                         var especie = cols[2];
                         var lat = parseFloat(cols[3]);
                         var lng = parseFloat(cols[4]);
                         var foto = cols[5];
 
                         if (!isNaN(lat) && !isNaN(lng)) {
+                            // Formatear la fecha en formato solo fecha
+                            var fechaFormateada = fecha.toLocaleDateString("es-AR");
+
                             // Crear el contenido del popup
                             var popupContent = `
-                                <strong>Especie:</strong> <span style="font-style:italic;">${especie}</span><br>
+                                <strong>Especie:</strong> <span class="popup-species">${especie}</span><br>
                                 <strong>Observador:</strong> ${observador}<br>
-                                <strong>Fecha:</strong> ${fecha}<br>
+                                <strong>Fecha:</strong> ${fechaFormateada}<br>
                                 <img src="${foto}" alt="Foto del nudibranquio" class="popup-img">
                             `;
-                            <style>
-    .popup-species {
-        font-style: italic;
-    }
-</style>
 
                             // Crear el marcador
                             var marker = L.marker([lat, lng]).bindPopup(popupContent);
