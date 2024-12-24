@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mapa de Ciencia Ciudadana: Nudibranquios</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css" />
+    <style>
+        #map { height: 600px; width: 100%; }
+        .popup-img { width: 100px; height: auto; }
+    </style>
+</head>
+<body>
+    <h2> </h2>
+    <div id="map"></div>
+
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
+    <script>
+        // Crear el mapa
+        var map = L.map('map').setView([-38.4161, -63.6167], 5); // Centrado en Argentina
+
+        // Añadir capa base de OpenStreetMap
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        // Crear una capa de agrupación de marcadores
+        var markers = L.markerClusterGroup();
+
+        // URL del archivo CSV en tu repositorio de GitHub
+        var csvUrl = "https://<NudiArg>.github.io/<MapaNudiArg>/registros_nudibranquios.csv"; // Asegúrate de poner la URL correcta
+
+        // Función para cargar el CSV y agregar los marcadores
+        function loadCSV(url) {
+            fetch(url)
+                .then(response => response.text())
+                .then(data => {
+                    var rows = data.split('\n'); // Dividir por líneas
+                    rows.forEach((row, index) => {
+                        if (index === 0 || row.trim() === "") return; // Omitir cabecera y filas vacías
+                        var cols = row.split(','); // Dividir columnas por comas
+
+                        // Leer las columnas del CSV
+                        var observador = cols[0];
+                        var fecha = cols[1];
+                        var especie = cols[2];
+                        var lat = parseFloat(cols[3]);
+                        var lng = parseFloat(cols[4]);
+                        var foto = cols[5];
+
+                        if (!isNaN(lat) && !isNaN(lng)) {
+                            // Crear el contenido del popup
+                            var popupContent = `
+                                <strong>Especie:</strong> ${especie}<br>
+                                <strong>Observador:</strong> ${observador}<br>
+                                <strong>Fecha:</strong> ${fecha}<br>
+                                <img src="${foto}" alt="Foto del nudibranquio" class="popup-img">
+                            `;
+
+                            // Crear el marcador
+                            var marker = L.marker([lat, lng]).bindPopup(popupContent);
+                            markers.addLayer(marker);
+                        }
+                    });
+
+                    // Añadir los marcadores agrupados al mapa
+                    map.addLayer(markers);
+                })
+                .catch(error => console.error('Error cargando el CSV:', error));
+        }
+
+        // Cargar los datos al iniciar
+        loadCSV(csvUrl);
+    </script>
+</body>
+</html>
