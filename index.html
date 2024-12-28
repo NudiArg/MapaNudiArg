@@ -58,12 +58,15 @@
                             // Formatear la fecha en formato solo fecha
                             var fechaFormateada = fecha.toLocaleDateString("es-AR");
 
+                            // Asegurarse que la URL de la imagen sea accesible para la previsualización
+                            var imagenUrl = foto; // Usar la URL directa de la imagen
+
                             // Crear el contenido del popup
                             var popupContent = `
                                 <strong>Especie:</strong> <span class="popup-species">${especie}</span><br>
                                 <strong>Observador:</strong> ${observador}<br>
                                 <strong>Fecha:</strong> ${fechaFormateada}<br>
-                                <img src="${foto}" alt="Foto del nudibranquio" class="popup-img">
+                                <img src="${imagenUrl}" alt="Foto del nudibranquio" class="popup-img">
                             `;
 
                             // Crear el marcador
