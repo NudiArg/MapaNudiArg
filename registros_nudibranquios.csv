@@ -1,2 +1,2 @@
 Observador:,  Fecha:,Epecie,Latitud:,Longitud:,Foto del Nudibranquio:
-"=QUERY('Respuestas de formulario 1'!A:M, "SELECT B, E, G, H, I, K", 1)",,,,,
+#ERROR!,,,,,
