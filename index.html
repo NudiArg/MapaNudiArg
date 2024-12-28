@@ -16,7 +16,7 @@
     </style>
 </head>
 <body>
-    <h2> </h2>
+    <h2>Mapa de Nudibranquios</h2>
     <div id="map"></div>
 
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
@@ -84,7 +84,7 @@
         // Función para convertir la URL de Google Drive a una URL directa de la imagen
         function convertGoogleDriveURLToImage(driveURL) {
             // Extraer el ID de la URL
-            var match = driveURL.match(/(?:drive\.google\.com\/open\?id=)([^&]+)/);
+            var match = driveURL.match(/(?:drive\.google\.com\/file\/d\/)([^\/]+)/);
             if (match) {
                 return `https://drive.google.com/uc?export=view&id=${match[1]}`;
             }
@@ -96,5 +96,3 @@
     </script>
 </body>
 </html>
-
-
