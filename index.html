@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css" />
     <style>
         #map { height: 600px; width: 100%; }
-        .popup-img { width: 100px; height: auto; }
+        .popup-img { width: 200px; height: auto; max-width: 100%; }  /* Ajusta el tamaño de la imagen */
         .popup-species {
             font-style: italic;
         }
@@ -58,15 +58,12 @@
                             // Formatear la fecha en formato solo fecha
                             var fechaFormateada = fecha.toLocaleDateString("es-AR");
 
-                            // Asegurarse que la URL de la imagen sea accesible para la previsualización
-                            var imagenUrl = foto; // Usar la URL directa de la imagen
-
                             // Crear el contenido del popup
                             var popupContent = `
                                 <strong>Especie:</strong> <span class="popup-species">${especie}</span><br>
                                 <strong>Observador:</strong> ${observador}<br>
                                 <strong>Fecha:</strong> ${fechaFormateada}<br>
-                                <img src="${imagenUrl}" alt="Foto del nudibranquio" class="popup-img">
+                                <img src="${foto}" alt="Foto del nudibranquio" class="popup-img">
                             `;
 
                             // Crear el marcador
