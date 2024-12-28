@@ -58,17 +58,34 @@
                             // Formatear la fecha en formato solo fecha
                             var fechaFormateada = fecha.toLocaleDateString("es-AR");
 
-                            // Crear el contenido del popup
-                            var popupContent = `
-                                <strong>Especie:</strong> <span class="popup-species">${especie}</span><br>
-                                <strong>Observador:</strong> ${observador}<br>
-                                <strong>Fecha:</strong> ${fechaFormateada}<br>
-                                <img src="${foto}" alt="Foto del nudibranquio" class="popup-img">
-                            `;
+                            // Verificar que la URL de la imagen sea válida antes de agregarla
+                            var image = new Image();
+                            image.onload = function() {
+                                // Crear el contenido del popup solo si la imagen carga correctamente
+                                var popupContent = `
+                                    <strong>Especie:</strong> <span class="popup-species">${especie}</span><br>
+                                    <strong>Observador:</strong> ${observador}<br>
+                                    <strong>Fecha:</strong> ${fechaFormateada}<br>
+                                    <img src="${foto}" alt="Foto del nudibranquio" class="popup-img">
+                                `;
 
-                            // Crear el marcador
-                            var marker = L.marker([lat, lng]).bindPopup(popupContent);
-                            markers.addLayer(marker);
+                                // Crear el marcador con la imagen cargada
+                                var marker = L.marker([lat, lng]).bindPopup(popupContent);
+                                markers.addLayer(marker);
+                            };
+                            image.onerror = function() {
+                                // Si la imagen no carga, podemos agregar un texto alternativo o una imagen predeterminada
+                                var popupContent = `
+                                    <strong>Especie:</strong> <span class="popup-species">${especie}</span><br>
+                                    <strong>Observador:</strong> ${observador}<br>
+                                    <strong>Fecha:</strong> ${fechaFormateada}<br>
+                                    <img src="https://via.placeholder.com/200" alt="Imagen no disponible" class="popup-img">
+                                `;
+                                var marker = L.marker([lat, lng]).bindPopup(popupContent);
+                                markers.addLayer(marker);
+                            };
+                            image.src = foto; // Intentamos cargar la imagen desde la URL
+
                         }
                     });
 
