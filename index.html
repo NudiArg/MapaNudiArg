@@ -74,7 +74,7 @@
                                 <strong>Especie:</strong> <span class="popup-species">${especie}</span><br>
                                 <strong>Observador:</strong> ${observador}<br>
                                 <strong>Fecha:</strong> ${fechaFormateada}<br>
-                                ${foto ? `<img src="${foto}" alt="Foto del nudibranquio" class="popup-img">` : ''}
+                                ${foto ? `<img src="${foto}" alt="Foto del nudibranquio" class="popup-img">` : 'No hay foto disponible.'}
                             `;
 
                             // Crear el marcador
@@ -83,14 +83,4 @@
                         }
                     });
 
-                    // Añadir los marcadores agrupados al mapa
-                    map.addLayer(markers);
-                })
-                .catch(error => console.error('Error cargando el CSV:', error));
-        }
-
-        // Cargar los datos al iniciar
-        loadCSV(csvUrl);
-    </script>
-</body>
-</html>
+                    // Añadir los marcadores agrup
