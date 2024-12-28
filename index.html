@@ -36,13 +36,6 @@
         // URL del archivo CSV en tu repositorio de GitHub
         var csvUrl = "https://raw.githubusercontent.com/NudiArg/MapaNudiArg/main/registros_nudibranquios.csv"; // Asegúrate de poner la URL correcta
 
-        // Función para extraer el ID de la URL de Google Drive
-        function extractDriveId(url) {
-            var regex = /(?:drive\.google\.com\/.*?id=)([a-zA-Z0-9_-]+)/;
-            var match = url.match(regex);
-            return match ? match[1] : null;
-        }
-
         // Función para cargar el CSV y agregar los marcadores
         function loadCSV(url) {
             fetch(url)
@@ -59,12 +52,11 @@
                         var especie = cols[2];
                         var lat = parseFloat(cols[3]);
                         var lng = parseFloat(cols[4]);
-                        var fotoUrl = cols[5]; // URL de la imagen en Google Drive
+                        var foto = cols[5];
 
                         if (!isNaN(lat) && !isNaN(lng)) {
-                            // Extraer el ID de Google Drive
-                            var fotoId = extractDriveId(fotoUrl);
-                            var foto = fotoId ? `https://drive.google.com/uc?export=view&id=${fotoId}` : '';
+                            // Convertir la URL de Google Drive a una URL directa de la imagen
+                            var fotoURL = convertGoogleDriveURLToImage(foto);
 
                             // Formatear la fecha en formato solo fecha
                             var fechaFormateada = fecha.toLocaleDateString("es-AR");
@@ -74,7 +66,7 @@
                                 <strong>Especie:</strong> <span class="popup-species">${especie}</span><br>
                                 <strong>Observador:</strong> ${observador}<br>
                                 <strong>Fecha:</strong> ${fechaFormateada}<br>
-                                ${foto ? `<img src="${foto}" alt="Foto del nudibranquio" class="popup-img">` : 'No hay foto disponible.'}
+                                <img src="${fotoURL}" alt="Foto del nudibranquio" class="popup-img">
                             `;
 
                             // Crear el marcador
@@ -83,4 +75,24 @@
                         }
                     });
 
-                    // Añadir los marcadores agrup
+                    // Añadir los marcadores agrupados al mapa
+                    map.addLayer(markers);
+                })
+                .catch(error => console.error('Error cargando el CSV:', error));
+        }
+
+        // Función para convertir la URL de Google Drive a una URL directa de la imagen
+        function convertGoogleDriveURLToImage(driveURL) {
+            var match = driveURL.match(/(?:drive\.google\.com\/open\?id=)([^&]+)/);
+            if (match) {
+                return `https://drive.google.com/uc?export=view&id=${match[1]}`;
+            }
+            return driveURL; // Si no es una URL de Google Drive válida, devuelve la original
+        }
+
+        // Cargar los datos al iniciar
+        loadCSV(csvUrl);
+    </script>
+</body>
+</html>
+
