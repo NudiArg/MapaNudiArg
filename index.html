@@ -12,6 +12,9 @@
         .popup-species {
             font-style: italic;
         }
+        .popup-content {
+            line-height: 2.0; /* Aumenta el interlineado a 2.0 */
+        }
     </style>
 </head>
 <body>
@@ -32,7 +35,7 @@
         // Crear una capa de agrupación de marcadores
         var markers = L.markerClusterGroup();
 
-        // URL del archivo CSV en tu repositorio de GitHub
+        // URL del archivo CSV
         var csvUrl = "https://raw.githubusercontent.com/NudiArg/MapaNudiArg/main/registros_nudibranquios.csv"; // Asegúrate de poner la URL correcta
 
         // Función para cargar el CSV y agregar los marcadores
@@ -60,12 +63,14 @@
                             // Formatear la fecha en formato solo fecha
                             var fechaFormateada = fecha.toLocaleDateString("es-AR");
 
-                            // Crear el contenido del popup
+                            // Crear el contenido del popup con interlineado aumentado
                             var popupContent = `
-                                <strong>Especie:</strong> <span class="popup-species">${especie}</span><br>
-                                <strong>Observador:</strong> ${observador}<br>
-                                <strong>Fecha:</strong> ${fechaFormateada}<br>
-                                <a href="${fotoURL}" target="_blank" rel="noopener noreferrer">Ver imagen</a>
+                                <div class="popup-content">
+                                    <strong>Especie:</strong> <span class="popup-species">${especie}</span><br>
+                                    <strong>Observador:</strong> ${observador}<br>
+                                    <strong>Fecha:</strong> ${fechaFormateada}<br>
+                                    <a href="${fotoURL}" target="_blank" rel="noopener noreferrer">Ver imagen</a>
+                                </div>
                             `;
 
                             // Crear el marcador
