@@ -13,7 +13,7 @@
 </head>
 <body>
 
-<h2>Formulario de Registro con Mapa</h2>
+<h2> </h2>
 
 <!-- Mapa -->
 <div id="map"></div>
@@ -39,31 +39,6 @@
         attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map);
 
-    // Variables para almacenar coordenadas
-    var lat, lng;
-
-    // Captura las coordenadas cuando el usuario hace clic en el mapa
-    map.on('click', function(e) {
-        lat = e.latlng.lat;
-        lng = e.latlng.lng;
-
-        document.getElementById('lat').value = lat;
-        document.getElementById('lng').value = lng;
-
-        localStorage.setItem('lat', lat);
-        localStorage.setItem('lng', lng);
-    });
-
-    // Al enviar el formulario, verifica coordenadas en localStorage
-    document.getElementById('googleForm').onsubmit = function() {
-        var latFromStorage = localStorage.getItem('lat');
-        var lngFromStorage = localStorage.getItem('lng');
-
-        if (latFromStorage && lngFromStorage) {
-            document.getElementById('lat').value = latFromStorage;
-            document.getElementById('lng').value = lngFromStorage;
-        }
-    };
 
     // ---------- Cargar registros desde CSV en GitHub via jsDelivr ----------
     const csvUrl = "https://cdn.jsdelivr.net/gh/NudiArg/MapaNudiArg@principal/registros_nudibranquios.csv";
@@ -94,3 +69,4 @@
 
 </body>
 </html>
+
