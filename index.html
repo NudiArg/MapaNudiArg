@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mapa de Nudibranquios Argentina</title>
+    <title>Formulario con Mapa</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <style>
         #map { height: 700px; width: 100%; margin-bottom: 20px; }
@@ -13,8 +13,9 @@
 </head>
 <body>
 
-<h2>Mapa de Nudibranquios</h2>
+<h2>Formulario de Registro con Mapa</h2>
 
+<!-- Mapa -->
 <div id="map"></div>
 
 <!-- Formulario de Google Forms -->
@@ -31,15 +32,17 @@
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 <script>
-    // Inicializar el mapa
+    // Inicializa el mapa centrado en Argentina
     var map = L.map('map').setView([-38.4161, -63.6167], 5);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map);
 
-    // Captura de coordenadas para el formulario
+    // Variables para almacenar coordenadas
     var lat, lng;
+
+    // Captura las coordenadas cuando el usuario hace clic en el mapa
     map.on('click', function(e) {
         lat = e.latlng.lat;
         lng = e.latlng.lng;
@@ -51,17 +54,18 @@
         localStorage.setItem('lng', lng);
     });
 
+    // Al enviar el formulario, verifica coordenadas en localStorage
     document.getElementById('googleForm').onsubmit = function() {
         var latFromStorage = localStorage.getItem('lat');
         var lngFromStorage = localStorage.getItem('lng');
 
-        if(latFromStorage && lngFromStorage) {
+        if (latFromStorage && lngFromStorage) {
             document.getElementById('lat').value = latFromStorage;
             document.getElementById('lng').value = lngFromStorage;
         }
     };
 
-    // ---------- Cargar registros desde GitHub via jsDelivr ----------
+    // ---------- Cargar registros desde CSV en GitHub via jsDelivr ----------
     const csvUrl = "https://cdn.jsdelivr.net/gh/NudiArg/MapaNudiArg@principal/registros_nudibranquios.csv";
 
     fetch(csvUrl)
@@ -72,11 +76,11 @@
             skipEmptyLines: true,
             complete: function(results) {
                 results.data.forEach(row => {
-                    const lat = parseFloat(row.latitud);    // columna "latitud"
-                    const lng = parseFloat(row.longitud);   // columna "longitud"
-                    const nombre = row.nombre || "";        // columna opcional
+                    const lat = parseFloat(row.latitud);
+                    const lng = parseFloat(row.longitud);
+                    const nombre = row.nombre || "";
 
-                    if(!isNaN(lat) && !isNaN(lng)) {
+                    if (!isNaN(lat) && !isNaN(lng)) {
                         L.marker([lat, lng])
                          .addTo(map)
                          .bindPopup(nombre);
