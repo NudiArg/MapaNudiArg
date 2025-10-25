@@ -6,7 +6,9 @@
     <title>Mapa de Nudibranquios Argentina</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <style>
-        #map { height: 700px; width: 100%; }
+        #map { height: 700px; width: 100%; margin-bottom: 20px; }
+        form { margin-top: 20px; }
+        input { margin-bottom: 10px; }
     </style>
 </head>
 <body>
@@ -14,6 +16,17 @@
 <h2>Mapa de Nudibranquios</h2>
 
 <div id="map"></div>
+
+<!-- Formulario de Google Forms -->
+<form id="googleForm" action="https://docs.google.com/forms/d/e/1FAIpQLSeN8q7yN_qIyO7eh2xDtmHOgUmQM96TtzkTtAUmBh4N_WVLTg/formResponse" method="POST" target="_self">
+    <label for="lat">Latitud:</label>
+    <input type="text" id="lat" name="entry.1591012667" readonly /><br>
+
+    <label for="lng">Longitud:</label>
+    <input type="text" id="lng" name="entry.739565894" readonly /><br>
+
+    <input type="submit" value="Enviar">
+</form>
 
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
@@ -25,10 +38,32 @@
         attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map);
 
-    // URL del CSV usando corsproxy.io
-    const csvUrl = "https://corsproxy.io/?https://raw.githubusercontent.com/NudiArg/MapaNudiArg/refs/heads/main/registros_nudibranquios.csv";
+    // Captura de coordenadas para el formulario
+    var lat, lng;
+    map.on('click', function(e) {
+        lat = e.latlng.lat;
+        lng = e.latlng.lng;
 
-    // Cargar y parsear CSV
+        document.getElementById('lat').value = lat;
+        document.getElementById('lng').value = lng;
+
+        localStorage.setItem('lat', lat);
+        localStorage.setItem('lng', lng);
+    });
+
+    document.getElementById('googleForm').onsubmit = function() {
+        var latFromStorage = localStorage.getItem('lat');
+        var lngFromStorage = localStorage.getItem('lng');
+
+        if(latFromStorage && lngFromStorage) {
+            document.getElementById('lat').value = latFromStorage;
+            document.getElementById('lng').value = lngFromStorage;
+        }
+    };
+
+    // ---------- Cargar registros desde GitHub via jsDelivr ----------
+    const csvUrl = "https://cdn.jsdelivr.net/gh/NudiArg/MapaNudiArg@principal/registros_nudibranquios.csv";
+
     fetch(csvUrl)
     .then(response => response.text())
     .then(data => {
@@ -37,9 +72,9 @@
             skipEmptyLines: true,
             complete: function(results) {
                 results.data.forEach(row => {
-                    const lat = parseFloat(row.latitud);  // columna "latitud"
-                    const lng = parseFloat(row.longitud); // columna "longitud"
-                    const nombre = row.nombre || "";      // columna opcional
+                    const lat = parseFloat(row.latitud);    // columna "latitud"
+                    const lng = parseFloat(row.longitud);   // columna "longitud"
+                    const nombre = row.nombre || "";        // columna opcional
 
                     if(!isNaN(lat) && !isNaN(lng)) {
                         L.marker([lat, lng])
