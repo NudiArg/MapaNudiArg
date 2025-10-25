@@ -3,70 +3,77 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Formulario con Mapa</title>
+    <title>Mapa de Ciencia Ciudadana: Nudibranquios</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css" />
     <style>
-        #map { height: 700px; width: 100%; margin-bottom: 20px; }
-        form { margin-top: 20px; }
-        input { margin-bottom: 10px; }
+        #map { height: 600px; width: 100%; }
+        .popup-img { width: 100px; height: auto; }
     </style>
 </head>
 <body>
+    <h2> </h2>
+    <div id="map"></div>
 
-<h2> </h2>
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
+    <script>
+        // Crear el mapa
+        var map = L.map('map').setView([-38.4161, -63.6167], 5); // Centrado en Argentina
 
-<!-- Mapa -->
-<div id="map"></div>
+        // Añadir capa base de OpenStreetMap
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
 
-<!-- Formulario de Google Forms -->
-<form id="googleForm" action="https://docs.google.com/forms/d/e/1FAIpQLSeN8q7yN_qIyO7eh2xDtmHOgUmQM96TtzkTtAUmBh4N_WVLTg/formResponse" method="POST" target="_self">
-    <label for="lat">Latitud:</label>
-    <input type="text" id="lat" name="entry.1591012667" readonly /><br>
+        // Crear una capa de agrupación de marcadores
+        var markers = L.markerClusterGroup();
 
-    <label for="lng">Longitud:</label>
-    <input type="text" id="lng" name="entry.739565894" readonly /><br>
+        // URL del archivo CSV en tu repositorio de GitHub
+        var csvUrl = "https://<NudiArg>.github.io/<MapaNudiArg>/registros_nudibranquios.csv"; // Asegúrate de poner la URL correcta
 
-    <input type="submit" value="Enviar">
-</form>
+        // Función para cargar el CSV y agregar los marcadores
+        function loadCSV(url) {
+            fetch(url)
+                .then(response => response.text())
+                .then(data => {
+                    var rows = data.split('\n'); // Dividir por líneas
+                    rows.forEach((row, index) => {
+                        if (index === 0 || row.trim() === "") return; // Omitir cabecera y filas vacías
+                        var cols = row.split(','); // Dividir columnas por comas
 
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
-<script>
-    // Inicializa el mapa centrado en Argentina
-    var map = L.map('map').setView([-38.4161, -63.6167], 5);
+                        // Leer las columnas del CSV
+                        var observador = cols[0];
+                        var fecha = cols[1];
+                        var especie = cols[2];
+                        var lat = parseFloat(cols[3]);
+                        var lng = parseFloat(cols[4]);
+                        var foto = cols[5];
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; OpenStreetMap contributors'
-    }).addTo(map);
+                        if (!isNaN(lat) && !isNaN(lng)) {
+                            // Crear el contenido del popup
+                            var popupContent = `
+                                <strong>Especie:</strong> ${especie}<br>
+                                <strong>Observador:</strong> ${observador}<br>
+                                <strong>Fecha:</strong> ${fecha}<br>
+                                <img src="${foto}" alt="Foto del nudibranquio" class="popup-img">
+                            `;
 
+                            // Crear el marcador
+                            var marker = L.marker([lat, lng]).bindPopup(popupContent);
+                            markers.addLayer(marker);
+                        }
+                    });
 
-    // ---------- Cargar registros desde CSV en GitHub via jsDelivr ----------
-    const csvUrl = "https://cdn.jsdelivr.net/gh/NudiArg/MapaNudiArg@principal/registros_nudibranquios.csv";
+                    // Añadir los marcadores agrupados al mapa
+                    map.addLayer(markers);
+                })
+                .catch(error => console.error('Error cargando el CSV:', error));
+        }
 
-    fetch(csvUrl)
-    .then(response => response.text())
-    .then(data => {
-        Papa.parse(data, {
-            header: true,
-            skipEmptyLines: true,
-            complete: function(results) {
-                results.data.forEach(row => {
-                    const lat = parseFloat(row.latitud);
-                    const lng = parseFloat(row.longitud);
-                    const nombre = row.nombre || "";
-
-                    if (!isNaN(lat) && !isNaN(lng)) {
-                        L.marker([lat, lng])
-                         .addTo(map)
-                         .bindPopup(nombre);
-                    }
-                });
-            }
-        });
-    })
-    .catch(err => console.error("Error al cargar los datos del CSV:", err));
-</script>
-
+        // Cargar los datos al iniciar
+        loadCSV(csvUrl);
+    </script>
 </body>
 </html>
-
