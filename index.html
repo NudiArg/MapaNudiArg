@@ -3,100 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mapa de Nudibranquios</title>
+    <title>Mapa de Nudibranquios Argentina</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css" />
-    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css" />
     <style>
-        #map { height: 600px; width: 100%; }
-        .popup-species {
-            font-style: italic;
-        }
-        .popup-content {
-            line-height: 2.0; /* Aumenta el interlineado a 2.0 */
-        }
+        #map { height: 700px; width: 100%; }
     </style>
 </head>
 <body>
-    <h2>  </h2>
-    <div id="map"></div>
 
-    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-    <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
-    <script>
-        // Crear el mapa
-        var map = L.map('map').setView([-38.4161, -63.6167], 5); // Centrado en Argentina
+<h2>Mapa de Nudibranquios</h2>
 
-        // Añadir capa base de OpenStreetMap
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        }).addTo(map);
+<div id="map"></div>
 
-        // Crear una capa de agrupación de marcadores
-        var markers = L.markerClusterGroup();
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+<script>
+    // Inicializar el mapa
+    var map = L.map('map').setView([-38.4161, -63.6167], 5);
 
-        // URL del archivo CSV
-        var csvUrl = "https://raw.githubusercontent.com/NudiArg/MapaNudiArg/main/registros_nudibranquios.csv"; // Asegúrate de poner la URL correcta
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
 
-        // Función para cargar el CSV y agregar los marcadores
-        function loadCSV(url) {
-            fetch(url)
-                .then(response => response.text())
-                .then(data => {
-                    var rows = data.split('\n'); // Dividir por líneas
-                    rows.forEach((row, index) => {
-                        if (index === 0 || row.trim() === "") return; // Omitir cabecera y filas vacías
-                        var cols = row.split(','); // Dividir columnas por comas
+    // URL del CSV usando corsproxy.io
+    const csvUrl = "https://corsproxy.io/?https://raw.githubusercontent.com/NudiArg/MapaNudiArg/refs/heads/main/registros_nudibranquios.csv";
 
-                        // Leer las columnas del CSV
-                        var observador = cols[0];
-                        var fecha = new Date(cols[1]); // Convertir la fecha a un objeto Date
-                        var especie = cols[2];
-                        var lat = parseFloat(cols[3]);
-                        var lng = parseFloat(cols[4]);
-                        var foto = cols[5];
+    // Cargar y parsear CSV
+    fetch(csvUrl)
+    .then(response => response.text())
+    .then(data => {
+        Papa.parse(data, {
+            header: true,
+            skipEmptyLines: true,
+            complete: function(results) {
+                results.data.forEach(row => {
+                    const lat = parseFloat(row.latitud);  // columna "latitud"
+                    const lng = parseFloat(row.longitud); // columna "longitud"
+                    const nombre = row.nombre || "";      // columna opcional
 
-                        if (!isNaN(lat) && !isNaN(lng)) {
-                            // Convertir la URL de Google Drive a formato adecuado para visualización
-                            var fotoURL = convertGoogleDriveURLToImage(foto);
-
-                            // Formatear la fecha en formato solo fecha
-                            var fechaFormateada = fecha.toLocaleDateString("es-AR");
-
-                            // Crear el contenido del popup con interlineado aumentado
-                            var popupContent = `
-                                <div class="popup-content">
-                                    <strong>Especie:</strong> <span class="popup-species">${especie}</span><br>
-                                    <strong>Observador:</strong> ${observador}<br>
-                                    <strong>Fecha:</strong> ${fechaFormateada}<br>
-                                    <a href="${fotoURL}" target="_blank" rel="noopener noreferrer">Ver imagen</a>
-                                </div>
-                            `;
-
-                            // Crear el marcador
-                            var marker = L.marker([lat, lng]).bindPopup(popupContent);
-                            markers.addLayer(marker);
-                        }
-                    });
-
-                    // Añadir los marcadores agrupados al mapa
-                    map.addLayer(markers);
-                })
-                .catch(error => console.error('Error cargando el CSV:', error));
-        }
-
-        // Función para convertir la URL de Google Drive a una URL directa de la imagen
-        function convertGoogleDriveURLToImage(driveURL) {
-            // Extraer el ID de la URL
-            var match = driveURL.match(/(?:drive\.google\.com\/file\/d\/)([^\/]+)/);
-            if (match) {
-                return `https://drive.google.com/uc?export=view&id=${match[1]}`;
+                    if(!isNaN(lat) && !isNaN(lng)) {
+                        L.marker([lat, lng])
+                         .addTo(map)
+                         .bindPopup(nombre);
+                    }
+                });
             }
-            return driveURL; // Si no es una URL de Google Drive válida, devuelve la original
-        }
+        });
+    })
+    .catch(err => console.error("Error al cargar los datos del CSV:", err));
+</script>
 
-        // Cargar los datos al iniciar
-        loadCSV(csvUrl);
-    </script>
 </body>
 </html>
